@@ -1,0 +1,28 @@
+---
+title: My Favourite Things Management
+author: Paulius Alaburda
+date: '2020-07-06'
+slug: my-favourite-things-management
+categories:
+  - my favourite things
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-07-06T10:36:31+03:00'
+featured: nos
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+draft: false
+---
+
+I have recently started pursuing a more management-oriented career path, so I have started collecting thoughts and resources that I found interesting and beneficial.
+
+## Twitter threads
+
+```{r echo=FALSE}
+blogdown::shortcode('tweet', '1279836969044852738')
+```

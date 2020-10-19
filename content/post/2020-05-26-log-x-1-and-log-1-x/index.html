@@ -1,0 +1,51 @@
+---
+title: log(x+1)* and log(1+x)*
+author: Paulius Alaburda
+date: '2020-05-26'
+slug: log-x-1-and-log-1-x
+categories:
+  - r
+  - statistics
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-05-26T22:26:57+03:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p>I’ll be honest, my math skills are not great and I haven’t studied maths formally since high school. However, Lior Pachter’s <a href="https://www.biorxiv.org/content/10.1101/2020.05.19.100214v2">preprint</a> brings a methodological issue in science through a mathematical lens really well. I had to look up a few things and I think it might be worth exploring the paper through the lens of a simulation.</p>
+<p>So the first equation in the paper looks like this:</p>
+<p><span class="math display">\[E[X|X &gt; 0] = \frac{\lambda}{1-e^{-\lambda}} \]</span>
+Essentially, what is expected value of a Poisson random variable after you filter out any non-zero results? If <span class="math inline">\(\lambda\)</span> is infinitely large, the expected value will approach <span class="math inline">\(\lambda\)</span>, however, what happens if it approached zero? Using <a href="https://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule">L’Hôpital’s rule</a> we can estimate that the expected value will be roughly equal to 1. Here’s a quick simulation to confirm this:</p>
+<pre class="r"><code>library(purrr)
+library(tidyverse)
+
+
+df &lt;- data.frame(Lambdas = c(0.00001,0.0001,0.0005,0.001,0.002,seq(from = 0.0001, to = 10, length.out = 30))) %&gt;% 
+  mutate(sim_data = map(Lambdas, ~rpois(100,.))) %&gt;%
+  unnest(sim_data) %&gt;% 
+  group_by(Lambdas) %&gt;% 
+  mutate(`Expected value` = mean(sim_data)) %&gt;%
+  ungroup() %&gt;% 
+  group_by(Lambdas,sim_data &gt; 0) %&gt;% 
+  mutate(`Expected value when X &gt; 0` = mean(sim_data)) %&gt;%
+  ungroup() %&gt;% 
+  filter(`sim_data &gt; 0` == TRUE) %&gt;% 
+  select(Lambdas,`Expected value`,`Expected value when X &gt; 0`) %&gt;% 
+  unique() %&gt;% 
+  gather(key = &quot;Measurement&quot;, value = &quot;Mean&quot;, `Expected value`,`Expected value when X &gt; 0`)
+  
+df %&gt;% ggplot(aes(x = log(Lambdas), y = Mean, color = Measurement)) + geom_line(alpha = 0.5, size = 1) + theme_bw() + labs(title = &quot;When lambda is sufficiently large, filtering zero counts has no effect&quot;) + scale_y_continuous(breaks = c(1:10))</code></pre>
+<p><img src="/post/2020-05-26-log-x-1-and-log-1-x/index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The paper points out a great example - in cases of gene expression, <span class="math inline">\(\lambda\)</span> can be small and filtering out zero counts (which could be wrongly interpreted as absence of the gene) will make lower gene expression indistinguishable from higher gene expression when both of them are low.</p>
+<p>There’s a second issue when you try to log transform your counts. Log(0) is undefined, so what usually happens is that all the counts are incremented by one. This essentially means that we are filtering out zero counts and replacing them with ones. As we have seen for large lambdas, that does not really have an effect but it does have a large effect when we are dealing with rare events.</p>
+<p>This is important in fields outside of RNA sequencing as well. For example, morphological studies can deal with cell count data as well as counts of certain structures of interest. I vaguely remember having to deal with count data during my undergraduate research years and failing to apply proper methods. If you are an undergrad reading this - do not log transform your count data if you think the event of interest is rare!</p>
+<p>Do <a href="https://www.biorxiv.org/content/10.1101/2020.05.19.100214v2.full.pdf+html">read</a> the whole thing, it’s short and brings references to explore further. Quite recommended.</p>

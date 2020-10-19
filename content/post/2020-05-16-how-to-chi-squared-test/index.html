@@ -1,0 +1,423 @@
+---
+title: How to Chi-squared test
+author: Paulius Alaburda
+date: '2020-05-16'
+slug: []
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-05-16T15:00:12+03:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p>As I am working through <a href="https://xcelab.net/rm/statistical-rethinking/">Statistical Rethinking</a> and picking up new tools, I decided to rework my knowledge of null hypothesis testing. This is definitely not the worst tutorial on the Chi-squared test but this is more of a write up to wrap my head around it. I think this will of interest<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> for first year undergraduates or students interested in competing in biology olympiads.</p>
+<div id="premise-of-the-chi-squared-test" class="section level2">
+<h2>Premise of the Chi-squared test</h2>
+<p>Kearl Pearson created the test in 1900 to answer the question whether two or more categorical variables are associated with one another. It is built on the idea that the sum of squares of <em>independent</em> normal distributions is distributed as a Chi-squared distribution. If the distributions were <em>dependent</em>, then their sum of squares would <em>not</em> follow a Chi-squared distribution.</p>
+<p>Now, we usually cannot know the whole distribution and instead we collect samples via surveys and experiments (as in, we usually don’t know the exact gender, political affiliation or age breakdown of the whole population we are studying). However, we do know what a Chi-squared distribution should like under the null hypothesis of there being no association. So by using the test we get a single chi-squared value and check where that value falls in the Chi-squared distribution. Through that, we can calculate the probability of getting a value equal to or greater than the value we calculated, i.e. the p value.</p>
+</div>
+<div id="step-by-step-of-the-chi-squared-test" class="section level2">
+<h2>Step by step of the Chi-squared test</h2>
+<p>That sounds a little too much for me and probably for a lot of students out there as well. What usually happens is that a workflow is taught instead: gather categorical data, shove that into the Chi-squared test formula and stick your Chi-squared value and your p value into the paper<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+<p>In my case, I was taught how to perform the Chi-squared test by hand. That’s actually great because it lets us breakdown the Chi-squared test formula<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>:</p>
+<p><span class="math display">\[\tilde{\chi}^2=\sum_{k=1}^{n} \frac{(O_k - E_k)^2}{E_k}\]</span></p>
+<p>Here <span class="math inline">\(O_k\)</span> is the observed count of a category, <span class="math inline">\(E_k\)</span> is the expected count.</p>
+<p>Let’s say you are given a contingency table of two variables (in this case, the number of cylinders and the number of gears from the <code>mtcars</code> dataset).</p>
+<ol style="list-style-type: decimal">
+<li>First, create a contingency table. This shows our observed values <span class="math inline">\(O_k\)</span> for each combination of gear and cylinder:</li>
+</ol>
+<pre class="r"><code>library(tidyverse)
+
+observed &lt;- table(mtcars$cyl, mtcars$gear)
+
+observed %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">12</td>
+<td align="right">0</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" style="list-style-type: decimal">
+<li>Then, find the expected values <span class="math inline">\(E_k\)</span> as though there was no association between the two. If you were forced to do this with pen and paper, you would have to calculate the proportion of each type of gear and each type of cylinder. Using R, here is the proportion of each type of cylinder:</li>
+</ol>
+<pre class="r"><code>cyl_summary &lt;- mtcars %&gt;% count(cyl) %&gt;% mutate(Proportion = prop.table(n))
+
+cyl_summary %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">cyl</th>
+<th align="right">n</th>
+<th align="right">Proportion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">11</td>
+<td align="right">0.34375</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">7</td>
+<td align="right">0.21875</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">14</td>
+<td align="right">0.43750</td>
+</tr>
+</tbody>
+</table>
+<p>And each type of gear:</p>
+<pre class="r"><code>gear_summary &lt;- mtcars %&gt;% count(gear) %&gt;% mutate(Proportion = prop.table(n)) 
+
+gear_summary %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">gear</th>
+<th align="right">n</th>
+<th align="right">Proportion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">15</td>
+<td align="right">0.46875</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">12</td>
+<td align="right">0.37500</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0.15625</td>
+</tr>
+</tbody>
+</table>
+<p>If there was no association between gear and cylinder, we would expect that the probability of a 4 cylinder car with 3 gears would be the probability of a 4 cylinder car times the probability of 3 gear car. You can have <code>R</code> this for you for each combination:</p>
+<pre class="r"><code>tbl_prop &lt;- cyl_summary$Proportion %o% gear_summary$Proportion
+rownames(tbl_prop) &lt;- c(4,6,8)
+colnames(tbl_prop) &lt;- c(3,4,5)
+
+tbl_prop %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">0.1611328</td>
+<td align="right">0.1289062</td>
+<td align="right">0.0537109</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">0.1025391</td>
+<td align="right">0.0820312</td>
+<td align="right">0.0341797</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">0.2050781</td>
+<td align="right">0.1640625</td>
+<td align="right">0.0683594</td>
+</tr>
+</tbody>
+</table>
+<p>To get the expected values <span class="math inline">\(E_k\)</span>, we can multiply the probabilities by the number of total observations (in this case, 32):</p>
+<pre class="r"><code>expected &lt;- tbl_prop*sum(observed)
+
+expected %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">5.15625</td>
+<td align="right">4.125</td>
+<td align="right">1.71875</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">3.28125</td>
+<td align="right">2.625</td>
+<td align="right">1.09375</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">6.56250</td>
+<td align="right">5.250</td>
+<td align="right">2.18750</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" style="list-style-type: decimal">
+<li>Then calculate the difference between the observed and the expected values. This gives you a table of differences between <span class="math inline">\(O_k\)</span> and <span class="math inline">\(E_k\)</span>:</li>
+</ol>
+<pre class="r"><code>(observed-expected) %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">-4.15625</td>
+<td align="right">3.875</td>
+<td align="right">0.28125</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">-1.28125</td>
+<td align="right">1.375</td>
+<td align="right">-0.09375</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">5.43750</td>
+<td align="right">-5.250</td>
+<td align="right">-0.18750</td>
+</tr>
+</tbody>
+</table>
+<p>For example, we did not observe any cars with 8 cylinders and 4 gears but based on the how frequent 8 cylinder cars and 4 gear cars are, we expected to see 5.25 cars.</p>
+<p>Now what’s interesting is that the sum of all those differences will always sum to 0. That is inconvenient, so what Pearson did in 1900 is square the differences, giving us this:</p>
+<pre class="r"><code>(observed-expected)^2 %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">17.274414</td>
+<td align="right">15.015625</td>
+<td align="right">0.0791016</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">1.641602</td>
+<td align="right">1.890625</td>
+<td align="right">0.0087891</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">29.566406</td>
+<td align="right">27.562500</td>
+<td align="right">0.0351562</td>
+</tr>
+</tbody>
+</table>
+<ol start="4" style="list-style-type: decimal">
+<li>Divide by the expected value - without this step <span class="math inline">\((O_k-E_k)^2\)</span> is just proportional to the number of counts, so comparing, for example, a sample of a 1000 counts and 100 counts would be impossible. That is why you need to normalise the values by dividing by the expected value<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>.</li>
+</ol>
+<pre class="r"><code>((observed-expected)^2/expected) %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">3.3501894</td>
+<td align="right">3.6401515</td>
+<td align="right">0.0460227</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">0.5002976</td>
+<td align="right">0.7202381</td>
+<td align="right">0.0080357</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">4.5053571</td>
+<td align="right">5.2500000</td>
+<td align="right">0.0160714</td>
+</tr>
+</tbody>
+</table>
+<ol start="5" style="list-style-type: decimal">
+<li>Sum the resulting values:</li>
+</ol>
+<pre class="r"><code>chisq_rs &lt;- sum((observed-expected)^2/expected)
+print(chisq_rs)</code></pre>
+<pre><code>## [1] 18.03636</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li>Using a reference table (for example, <a href="https://people.smp.uq.edu.au/YoniNazarathy/stat_models_B_course_spring_07/distributions/chisqtab.pdf">this one</a> one), find the critical p value (in this case, for df = 2). You do that by finding the largest Chi-squared value that is smaller than the one we calculated (in this case, smaller than 18.04). In this case, 18.04 for df = 2 is larger than the critical value of 9.21 so we can say that the p value is less than 0.01.</li>
+</ol>
+<p>To be exact, let’s see where this value falls if we were to build a Chi-squared distribution with df = 2:</p>
+<pre class="r"><code>chisq_sample &lt;- rchisq(10000, 2)
+
+qplot(chisq_sample) + geom_vline(xintercept = chisq_rs, color = &quot;red&quot;) + theme_bw()</code></pre>
+<p><img src="/post/2020-05-16-how-to-chi-squared-test/index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>chisq_ecdf &lt;- ecdf(chisq_sample)
+chisq_percentile &lt;- chisq_ecdf(chisq_rs)</code></pre>
+<p>Or, if we built a distribution function out of our samples, our value would fall into the 0.9998 percentile. Since that is definitely larger than 0.95, we can conclude that there is an association between the number of gears and the number of cylinders. Alternatively, this is what the Chi-squared test would have returned:</p>
+<pre class="r"><code>rs &lt;- chisq.test(observed)</code></pre>
+<pre><code>## Warning in chisq.test(observed): Chi-squared approximation may be incorrect</code></pre>
+<pre class="r"><code>rs</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  observed
+## X-squared = 18.036, df = 4, p-value = 0.001214</code></pre>
+<p>Which we could have reported as such (while also describing the count data):</p>
+<blockquote>
+<p>A chi-square test was conducted whether there is an association between the number of gears and the number of cylinders across different cars. The results were significant (χ<sup>2</sup>(4) = 18.04, p = 0.001)</p>
+</blockquote>
+</div>
+<div id="but-why-does-it-work" class="section level2">
+<h2>But why does it work?</h2>
+<p>I’ll be honest, it takes me a while to grok distributions beyond the Binomial and the Gaussian. A good explanation how the Chi-squared distribution is derived can be found <a href="https://www.rdatagen.net/post/a-little-intuition-and-simulation-behind-the-chi-square-test-of-independence/">here</a>.</p>
+<p>The chi-square (<span class="math inline">\(\chi^2\)</span>) distribution, as we have mentioned earlier, is a distribution of the sum of squares of two or more normal distributions. In other words, if you would square values from one normal distribution and add it to another, the result should approximate the Chi-square distribution:</p>
+<p><span class="math display">\[U∼N(0,1)\]</span>
+<span class="math display">\[V∼N(0,1)\]</span>
+<span class="math display">\[U^2+V^2∼\chi_2^2\]</span></p>
+<p>That subscript denotes that the sum of squares follows a <span class="math inline">\(\chi^2\)</span> distribution with 2 degrees of freedom. Alternatively, a square of just one normal distribution follows a <span class="math inline">\(\chi_1^2\)</span> distribution and for any number of degrees:</p>
+<p><span class="math display">\[\sum_{j=1}^{k} \chi_j^2∼\chi_k^2\]</span></p>
+<p>Let’s plot these distributions!</p>
+<pre class="r"><code>df &lt;- tibble(`Normal` = rnorm(10000, mean = 0, sd = 1),
+             `Normal squared` = Normal^2,
+             `Actual Chi-squared` = rchisq(10000,2),
+             `Chi-squared with df = 2` = `Normal squared` + rnorm(10000, mean = 0, sd = 1)^2) %&gt;%
+  gather(key = &quot;distribution&quot;, value = &quot;value&quot;) %&gt;% 
+  mutate(distribution = factor(distribution, levels = c(&quot;Normal&quot;,&quot;Normal squared&quot;,&quot;Chi-squared with df = 2&quot;,&quot;Actual Chi-squared&quot;)))
+
+ggplot(df, aes(x = value, fill = distribution)) + 
+  geom_histogram() + 
+  facet_grid(~distribution, scales = &quot;free_x&quot;) + 
+  guides(fill = FALSE) + 
+  theme_bw()</code></pre>
+<p><img src="/post/2020-05-16-how-to-chi-squared-test/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>So… Now what? How does any of this relate back to the Chi-squared test formula? Here’s where the central limit theorem comes in: even though any count data (whether it’s counting blood cells, people, adverse events) is distributed along a poisson distribution, <em>the sampling distribution</em> (as in, the result of collecting samples a lot of times) is similar to the normal distribution.</p>
+<p>To understand this, I’ve simulated two Poisson distributions (as in, count data). If we tried to build a Chi-squared distribution out of this data, what percentage of values would be higher than the 95th percentile of an actual Chi-squared distribution?</p>
+<pre class="r"><code>df &lt;- tibble(
+  pois_1 = rpois(10000, 10),
+  pois_2 = rpois(10000, 10),
+  chisq_real = rchisq(10000, df = 2)
+  ) %&gt;% 
+  mutate(pois_1 = (pois_1-mean(pois_1))/sd(pois_1),
+         pois_2 = (pois_2-mean(pois_2))/sd(pois_2)) %&gt;% 
+  mutate(chisq_11 = pois_1^2+pois_1^2,
+         chisq_12 = pois_1^2+pois_2^2) %&gt;% 
+  select(contains(&quot;chisq_&quot;)) %&gt;% 
+  gather(key = &quot;distribution&quot;, value = &quot;value&quot;) %&gt;%
+  mutate(over_95 = value &gt; qchisq(.95, df=2))
+
+ggplot(df, aes(x = value, fill = over_95)) + 
+  geom_histogram(alpha = 0.5, binwidth = 1) + 
+  facet_grid(~distribution) + 
+  theme_bw()</code></pre>
+<p><img src="/post/2020-05-16-how-to-chi-squared-test/index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><code>chisq_12</code> is built via two independent Poisson distributions, while <code>chisq_11</code> is just to identical samples added together (making the distributions dependent). From the chart it seems like it works and if you look at the percentage of values higher than the 95th percentile:</p>
+<pre class="r"><code>df %&gt;% 
+  group_by(distribution) %&gt;% 
+  summarise(over_95 = mean(over_95)) %&gt;% 
+  knitr::kable()</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">distribution</th>
+<th align="right">over_95</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chisq_11</td>
+<td align="right">0.0797</td>
+</tr>
+<tr class="even">
+<td align="left">chisq_12</td>
+<td align="right">0.0498</td>
+</tr>
+<tr class="odd">
+<td align="left">chisq_real</td>
+<td align="right">0.0490</td>
+</tr>
+</tbody>
+</table>
+<p>So <code>chisq_12</code> and <code>chisq_real</code> makes sense - around 5 per cent of values are going to be higher than the 95th percentile. For <code>chisq_11</code>, we see that is not the case and the percentage is higher!</p>
+<p>We can see that the Chi-squared distribution requires that the added distributions be independent. The final kicker comes in when we look back at the Chi-squared test formula:</p>
+<p><span class="math display">\[\tilde{\chi}^2=\sum_{k=1}^{n} \frac{(O_k - E_k)^2}{E_k}\]</span>
+If the difference between observed and expected values is small, then <span class="math inline">\(\chi^2\)</span> is small. If the difference is large, then <span class="math inline">\(\chi^2\)</span> is large. The observed values follow a normal distribution and the expected values also follow a normal distribution, therefore the squared difference can be modeled as a Chi-squared distribution. And since it can be modeled it can be turned into a probability of observing this or more extreme<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> data!</p>
+<p>To me this makes enough sense to trust it. In summary, Pearson created the formula that returns a value. This particular value increases or decreases based on the difference of observed and expected count data. The test statistic by itself does not tell us much, but we know that the formula should generate values that are distributed along a chi-squared distribution and we can translate the value into a probability by checking where Chi-squared test values fall in the Chi-squared test distribution.</p>
+<p>Even though the test is pretty simple, it packs a lot of assumptions and nuance. For a really good explanation, I would recommend checking out Danielle Navarro’s book <a href="https://learningstatisticswithr.com/lsr-0.6.pdf">Learning with R</a>.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Not necessarily interesting, haha<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>This would make for a great “HAHA CHI-SQUARED TEST GOES BRRR” meme.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>I am leaving out some nuance here by using the goodness of fit formula when I could also show the Test for Independence formula which looks like this: <span class="math inline">\(X^2=\sum\limits_{i=1}^I \sum\limits_{j=1}^J\dfrac{(O_{ij}-E_{ij})^2}{E_{ij}}\)</span> Although it is more correct, it also takes more time to read and understand for people not used to indices.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>A really good technical explanation can be found <a href="https://math.stackexchange.com/questions/2074029/why-do-we-divide-by-the-expected-value-in-the-chi-squared-test">here</a>. Essentially <span class="math inline">\(O_k\)</span> is a count therefore it can be modeled as a Poisson distribution (<span class="math inline">\(O_k ∼ Poisson(E_k,E_k)\)</span>) and with high enough counts the distribution becomes similar enough to the normal distribution with mean and variance <span class="math inline">\(E_k\)</span>.<a href="#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p>I am putting this clunky wording here just to be correct because the probability of observing an exact Chi-squared test value is always zero since the distribution is continuous.<a href="#fnref5" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
