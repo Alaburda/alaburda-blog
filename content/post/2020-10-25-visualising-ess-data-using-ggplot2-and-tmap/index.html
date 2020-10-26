@@ -1,0 +1,64 @@
+---
+title: Visualising ESS data using ggplot2 and tmap
+author: Paulius Alaburda
+date: '2020-10-25'
+slug: []
+categories:
+  - r
+tags:
+  - tmap
+  - ggplot2
+  - R
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-10-25T18:30:23+02:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p>I stumbled across rOpenSci’s package <a href="https://github.com/ropensci/essurvey">essurvey</a> that contains data from the European Social Survey (ESS) for European countries, including Lithuania! Also, tmap has a lot of excellent resources to get a head start, so this post shows how to access ESS data and visualise it with tmap.</p>
+<div id="downloading-ess-data" class="section level2">
+<h2>Downloading ESS data</h2>
+<p>Downloading ESS data is fairly straightforward - register your email in the ESS and start pulling data! I recommend installing the development version because the stable version was downloading .zip files that Windows couldn’t extract. To replicate this post, you should use:</p>
+<pre class="r"><code>import_country(&quot;Lithuania&quot;, 9)</code></pre>
+<p>I didn’t want to disclose my email here, so I have downloaded the data separately.</p>
+</div>
+<div id="so-what-is-the-ess-anyway" class="section level2">
+<h2>So what is the ESS anyway?</h2>
+</div>
+<div id="visualising-with-tmap" class="section level2">
+<h2>Visualising with tmap</h2>
+<p>All plotting packages depend on shapefiles. For Europe, it’s best to download the map from <a href="https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/countries">GISCO</a>. However, the map does not have municipality data for Lithuania. Fortunately, the shapefile is available over the <a href="https://shapes.openmap.lt/">OpenMap project</a>.</p>
+<p>This is how to build a basic tmap plot:</p>
+<pre class="r"><code>lt_map &lt;- read_sf(&quot;../../../static/data/admin_ribos.shp&quot;)
+
+lt_map_sen &lt;- lt_map %&gt;% filter(ADMIN_LEVE == 4)
+
+news &lt;- ess %&gt;% 
+  group_by(region = labelled::to_factor(region)) %&gt;% 
+  summarise(`Internet usage` = mean(netustm, na.rm = TRUE)) %&gt;% 
+  # count(region = labelled::to_factor(region), netusoft) %&gt;%
+  mutate(region = as.character(region)) %&gt;% 
+  mutate(region = case_when(region == &quot;Klaipedos apskritis&quot; ~ &quot;Klaipėdos apskritis&quot;,
+                            region == &quot;Šiauliu apskritis&quot; ~ &quot;Šiaulių apskritis&quot;,
+                            region == &quot;Taurages apskritis&quot; ~ &quot;Tauragės apskritis&quot;,
+                            region == &quot;Telšiu apskritis&quot; ~ &quot;Telšių apskritis&quot;,
+                            TRUE ~ region))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>lt_plot &lt;- lt_map_sen %&gt;% left_join(news, by = c(&quot;NAME&quot; = &quot;region&quot;))
+
+tm_shape(lt_plot) +
+  tm_fill(&quot;Internet usage&quot;) +
+  tm_polygons()</code></pre>
+<pre><code>## Warning: One tm layer group has duplicated layer types, which are omitted. To
+## draw multiple layers of the same type, use multiple layer groups (i.e. specify
+## tm_shape prior to each of them).</code></pre>
+<p><img src="/post/2020-10-25-visualising-ess-data-using-ggplot2-and-tmap/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
