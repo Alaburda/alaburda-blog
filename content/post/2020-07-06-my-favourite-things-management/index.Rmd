@@ -26,3 +26,7 @@ I have recently started pursuing a more management-oriented career path, so I ha
 ```{r echo=FALSE}
 blogdown::shortcode('tweet', '1279836969044852738')
 ```
+
+## Blog posts
+
+https://blog.danielna.com/choosing-the-management-track/
