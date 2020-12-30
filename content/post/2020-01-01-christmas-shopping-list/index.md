@@ -51,11 +51,14 @@ After Christmas season in 2019, I decided to think through the presents I gifted
   * Homo Ludens, Johan Huizinga
   * Rules of Play: Game Design Fundamentals, Katie Salen Tekinbas and Eric Zimmerman
 
-## Consumables
+## Consumables and Wearables
 
 1. Chocolate - David Siegel has a wonderful [guide](https://medium.com/@pullnews/david-siegels-chocolate-porn-156f648a69ab). I will be sure to try it out next year! Amedei has their e-shop in Italy with wonderful discounts during Black Friday.
 2. Coffee and tea - for tea, I would probably check out [eteaket](https://www.eteaket.co.uk/). For coffee, I would either go for a local roaster (in my case, it's Huracan Coffee) but there is wonderful list on [Reddit here](https://www.reddit.com/r/Coffee/comments/9272cl/where_to_buy_roasted_coffee_beans_in_europe/).
 3. Socks - I know, they are not consumables but they do wear out and get lost! Exactly the reason why gifting socks is a good idea - eventually your friend is going to run out and will need a pair. There's [Darn Tough](https://darntough.com/collections/men) for hikers, [Gammarelli](https://www.meschaussettesrouges.com/en/3_gammarelli) or [Marcoliani](https://www.marcoliani.it/en/distribution/) to show what a classy friend you are, [Stance](https://euro.stance.eu.com/) for the mid tier pricing, and [Anonymous Ism](https://anonymousism.com/) if you think your friend will like linen Japanese socks.
+4. Ties - [Daboti](https://www.daboti.lt/) has excellent Lithuanian ties.
+5. [Miracle Berries](https://www.amazon.com/MiralandBerry-Miracle-Fruit-Tablets-Berry) - miraculin makes everything sour taste sweet. No side effects. Have fun!
+6. Balsamic Vinegar - so apparently the good stuff is aged for 10-15 years and is actually different from store brought varieties. A bottle can run up to 30 Euros or more. MiaBella is a supposedly good brand.
 
 ## Kitchenware
 
@@ -81,9 +84,12 @@ After Christmas season in 2019, I decided to think through the presents I gifted
 6. [Power monitor](https://www.amazon.com/dp/B01CVMAK2M/) - you know how charging a phone via a laptop's USB port is horribly slow? This fixes that.
 7. [External power banks](https://www.amazon.co.uk/Mophie-PowerStation-X-Large-Portable-Charger-Black/dp/B07K4YQDLC/) - my suggestion would be Mophie but my huntch is that you would probably want to avoid the cheapest options altogether.
 8. [Logitech Spotlight Remote](https://www.logitech.com/en-us/product/spotlight-presentation-remote) - if I were still teaching, I sure as heck would want one!
+9. [Mini Microscopes](https://www.amazon.com/gp/product/B00LAX52IQ/) - these are great for friends with kids. Explore leaves, fabrics and pond critters.
+10. [3D Printing Pen](https://www.amazon.com/MYNT3D-Super-3D-Pen-Compatible) - haven't tried one the videos look great! Reminds me of stained glass paint you could draw on transparent sheets and then stick on windows.
 
 ## Handmade ideas
 
 1. [Cash in fake toy boxes](https://twitter.com/TwoClawsMedia/status/1210030954485633025)
 2. [Recipes in a jar](https://www.tasteofhome.com/collection/recipes-for-gifts-in-a-jar/) - the idea being that you have already measured the ingredients, all your friend has to do is add water/eggs/milk.
+
 
