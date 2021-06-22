@@ -1,0 +1,141 @@
+---
+title: "Wingspan Strategy Guide"
+description: |
+  A short description of the post.
+author:
+  - name: Paulius Alaburda
+    url: {}
+date: 06-22-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+Wingspan has been a phenomenal game. Stonemaier Games have sold [750 thousand units](https://stonemaiergames.com/2020-behind-the-scenes-stakeholder-report-for-stonemaier-games/), released two expansions and the game has reached [the number one spot in the Family section of BoardGameGeek](https://boardgamegeek.com/familygames/browse/boardgame?sort=rank&rankobjecttype=family&rankobjectid=5499&rank=1#1). Without a doubt, this is a go-to family game when you feel like Monopoly, Uno or Catan have been exhausted.
+
+This is a great gateway game for family as well as friends. If you have *Terraforming Mars* gathering dust on the shelf, it might be a good idea to introduce *Wingspan* first. Wingspan introduces multiple mechanics from other games so learning Wingspan is a great way to develop intuition about tableau building, card selection and collective goals.
+
+You can also learn to play Wingspan well. I have written this guide because I feel like Wingspan does not nudge players in the right direction. The layout of the board, the hints on the goal cards and the design of some of the bird cards does not offer an obvious way of playing *Wingspan*. In fact, *Wingspan* can accidentally nudge in the wrong direction! This guide is meant to correct these errors. It is based on my experience playing *Wingspan* and the data available online but it is in no way a be-all-end-all post on how to play well.  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Focusing on the Grasslands
+
+At first, it may seem like the game offers four potential strategies: focusing on one of three biomes (the forest, grassland or wetland), or trying to diversify across all of them as suggested by some of the goal and round cards. However, the board is misleading. Unlike cards or food tokens, eggs are worth points at the end of the game. Because of this, the "lay egg" action is the only action that can consistently provide points and will usually be the action that provides the most points. The optimal strategy is to build your tableau so that you could repeatedly lay eggs during the last few rounds and activate as many brown powers in the grasslands as possible.
+
+Because of this, I believe the forest and wetland biomes should act as supporting biomes. While it is not a bad idea to play birds that provide points upon activation, it is usually best to play birds that provide extra goal cards, food or cards (white powers), end of round powers (teal powers) or passive bonuses (pink powers). If possible, it's even better to play birds so that a single activation provides you with both food and cards. For example, a _Wood Duck_ in the forest biome is great because you can draw an extra card while gaining resources, and an _Osprey_ in the wetland biome enables you to get a resource along with cards. Combining these powers will save you precious turns to play more birds or lay more eggs.
+
+Since our goal is to maximise the value of laying eggs, it becomes easier to choose birds that can be played in the grasslands. Birds with flocking (tuck a card, draw a card), egg-laying abilities should be prioritised while birds with white, pink and teal powers should be avoided. Playing _Killdeer_, _Franklin's Gull_ and the ravens is great as is also playing other birds that provide extra food and extra cards. Finally, since there is going to be a lot of egg laying, choose birds that have extra egg capacity. They may have less points at first but ultimately the goal is to fill them up with eggs.
+
+## Alternatives to the Grassland-first strategy
+
+There may be games where you simply won't draw birds that enable a grassland strategy. An alternative strategy is to focus on high value birds and building as many of them as possible. At the end of the game, it's frequently worth building one or two high scoring birds or birds that give an extra bonus card. However, the strategy has limitations. To build your 4th bird, you will need to use 2 eggs. That effectively reduces the value of your played bird by 2 points. I believe that is only viable if you are playing either birds without effects (which give 7-9 points) or birds that draw additional bonus cards. Furthermore, bonus cards in _Wingspan_ are *very* variable - sometimes they might give 7 points, sometimes they might give 0 points. In the later stages of the game, playing anything worth less than 5 points is a lot of the time going to be worse than laying eggs. 
+
+Ultimately, the point of Wingspan is build "a crank" - an action that can provide as many points as possible each turn. Usually that will be laying eggs but sometimes you may end up developing the forest or the wetland. What's important to remember is that the grasslands by themselves can provide 4 points with each activation - in the final few rounds of the game, avoid turns that give less than that!
+
+## How to pick the best cards
+
+Knowing the best strategy allows us to rethink which bonus cards to pick, which round goals to pursue and which birds cards to play during a game. We can rate birds cards based on our desired abilities and, in turn, create a tier list of bird cards as well as bonus cards.
+
+For goal cards, we can start with a naive approach, where we can simply check which grasslands birds align best with goal cards:
+
+```{r}
+
+#remotes::install_github('coolbutuseless/wingspan')
+
+library(wingspan)
+library(tidyverse)
+library(DT)
+
+birds %>% 
+  pivot_longer(names_to = "biome", values_to = "has_biome", forest:wetland) %>% 
+  pivot_longer(names_to = "goal", values_to = "has_goal", anatomist:wildlife_gardener) %>%
+  filter(has_biome == TRUE, has_goal == TRUE) %>% 
+  count(biome,goal) %>% 
+  mutate(n = round(n/nrow(birds),2)) %>% 
+  pivot_wider(names_from = biome, values_from = n) %>% 
+  mutate(goal = gsub("_"," ",goal),
+         goal = str_to_title(goal)) %>% 
+  datatable()
+
+```
+
+Evaluating bird cards is trickier - you wlll need supporting forest and wetland birds to get your engine going. Here is my approach to evaluating the powers:
+
+* Brown powers for caching food, flocking and egg-laying have an expected activation count of 5.
+* Pink powers for caching food, flocking and egg-laying have an expected activation count of 3. It is possible to end up with more activations but it is also entirely possible that none of your opponents will meet the power condition. Furthermore, these powers are worth more at a lower player count. 
+* Predators also have 5 activations but they are weighted based on the percentage of birds as follows:
+
+```{r}
+
+
+birds %>% 
+  count(wingspan < 50, wingspan < 75, wingspan < 100) %>% 
+  mutate(n = n/sum(n)) %>% 
+  pivot_longer(names_to = "wingspan", values_to = "cat",-n) %>% 
+  filter(cat == TRUE) %>% 
+  group_by(wingspan) %>% 
+  summarise(pct = sum(n)*5) %>% 
+  knitr::kable()
+
+```
+
+* Predators that reduce their own activation costs are assumed will be played for 0 resources.
+* KIlldeer, Franklin's Gull and the ravens have a fixed value of 20. This is just to ensure they are properly evaluated as the "power 4".
+
+I am perfectly aware that some of the flocking birds tuck 2 cards, some of the egg-layers lay 2 eggs and these criteria do not consider teal and yellow powers. I might return to this at a later point or if someone suggests a clean way of evaluating the cards. 
+
+```{r}
+
+birds_ev <- birds %>% 
+  mutate(white_points = case_when(str_detect(power_text,"bonus cards") ~ 5L,
+                                  str_detect(power_text,"For each [rodent] in this bird's cost") ~ total_food_cost,
+                                  TRUE ~ 0L),
+         brown_points = case_when(power_category %in% c("Caching Food","Egg-laying") & power_color == "Brown" ~ 5L,
+                                  power_category %in% c("Caching Food","Egg-laying","Flocking") & power_color == "Pink" ~ 3L,
+                                  flocking & power_color == "Brown" ~ 5L,
+                                  TRUE ~ 0L),
+         hunting_points = case_when(str_detect(power_text,"<50cm") & power_category == "Hunting/Fishing" ~ 3L,
+                                    str_detect(power_text,"<75cm") & power_category == "Hunting/Fishing" ~ 4L,
+                                    str_detect(power_text,"<100cm") & power_category == "Hunting/Fishing" ~ 4L,
+                                    TRUE ~ 0L)) %>%
+  mutate(ev = egg_capacity+victory_points+white_points+brown_points+hunting_points) %>%
+  mutate(ev = case_when(common_name %in% c("Killdeer","Franklin's Gull","Chihuahuan Raven","Common Raven") ~ 20,
+                        TRUE ~ ev),
+         avg_ev = ev/total_food_cost,
+         avg_ev = round(ifelse(avg_ev == Inf,ev,avg_ev)),2)
+
+birds_ev %>%
+  select(common_name,set,ev,avg_ev,power_text) %>% 
+  arrange(desc(avg_ev)) %>% 
+  datatable()
+
+```
+
+This confirms some of the things from my experience: flocking birds are efficient but will score less points than some of the big birds that grant an extra bonus card.
+
+Even though this approach is pretty limited, we can try weighing the bonus cards based on these expected values.  
+
+```{r}
+
+birds_ev %>% 
+  pivot_longer(names_to = "biome", values_to = "has_biome", forest:wetland) %>% 
+  pivot_longer(names_to = "goal", values_to = "has_goal", anatomist:wildlife_gardener) %>%
+  filter(has_biome == TRUE, has_goal == TRUE) %>% 
+  count(biome,goal, wt = ev) %>% 
+  mutate(n = round(n/nrow(birds),2)) %>% 
+  pivot_wider(names_from = biome, values_from = n) %>% 
+  mutate(goal = gsub("_"," ",goal),
+         goal = str_to_title(goal)) %>% 
+  datatable()
+
+```
+The scores here are weighted based on the expected value of the cards (not the EV per food token!). For the most part, the ranking of the goal cards is similar but there are a few changes (e.g. Wilflife Gardener is lower than it was before).
+
+## Conclusion
+
+There you have it! A brief introduction on what to focus on in *Wingspan* and, consequently, which bird cards and goal cards should be picked first. Don't let the numbers distract you - *Wingspan* is an excellent zen game to be enjoyed with friends and family.
+
+
