@@ -89,6 +89,8 @@ t-distributed stochastic neighbor embedding (t-SNE) was developed in 2008 to emb
 
 library(tsne)
 
+set.seed(1)
+
 rs <- tsne(bird_matrix,
            max_iter = 3000)
 
@@ -120,6 +122,8 @@ Uniform manifold approximation and projection (UMAP) is a non-linear reduction t
 ```{r, warning = FALSE}
 
 library(umap)
+
+set.seed(1)
 
 rs <- umap(bird_matrix)
 
@@ -204,6 +208,7 @@ birds$image_url <- unlist(bird_urls)
 
 ## Building the interactive chart
 
+The interactive chart is built using `htmltools` and `highcharter`.
 
 ```{r}
 
@@ -285,3 +290,6 @@ highchart() %>%
     ) 
 
 ```
+
+The result looks excellent - the larger birds are set to the side, with the water ones grouped more closely to other water birds and the rest grouped along owls and kestrels (smaller but just as deadly!). Colorful birds also seemed to be grouped together each time I run UMAP even though their plumage wasn't encoded in the dataset. Overall, I am happy with the result as it lets me explore the "what's between X and Y" type of questions.
+
