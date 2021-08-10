@@ -11,7 +11,7 @@ output:
     self_contained: false
 ---
 
-**Wingspan** is a wonderful game. It has an accessible theme, beautiful components and is a great example of the board game hobby. What's great is that **Wingspan** also showcases over 300 unique birds - all of which can be accessed with the `wingspan` package!
+[Wingspan](https://boardgamegeek.com/boardgame/266192/wingspan) is a wonderful game. It has an accessible theme, beautiful components and is a great example of the board game hobby. What's great is that **Wingspan** also showcases over 300 unique birds. The game is amazing for families, but it's also amazing for R since all of birds can be accessed with the `wingspan` package!
 
 ## The `birds` dataset
 
@@ -79,11 +79,12 @@ birds %>%
        color = "Nest type")
 
 ```
-PCA did capture the variance in wingspan between the birds but it did not form distinct clusters. As we expected previously, PCA is not the best reduction technique for our dataset.
+
+PCA did capture the variance in wingspan between the birds but it did not form distinct clusters. Generally, I would not expect distinct clusters since birds come in all shapes and sizes but we will see that UMAP ultimately paints a better picture. As we expected previously, PCA is not the best reduction technique for our mixed dataset.
 
 ## t-SNE
 
-t-distributed stochastic neighbor embedding (t-SNE) was developed in 2008 to embed data points into a two or three dimensional space. t-SNE works in two ways: first, it creates a probability distribution over each pair of datapoints and assigns a probability based on how similar they are. Then, it creates a second probability distribution for the points when they're already on the manifold. Then, the divergence between the two distribution is minimised. The process in action is visualised [here](https://chasemc.github.io/post/animated-t-sne/). t-SNE is non-linear so a mixed dataset can be used. The only problem is that t-SNE has hyperparameters so the initial conditions may not return your desired result. For further reading on hyperparameter tuning, this [Distill article](https://distill.pub/2016/misread-tsne/) is excellent.
+t-distributed stochastic neighbor embedding (t-SNE) was developed in 2008 to embed data points into a two or three dimensional space. t-SNE works in two ways: first, it creates a probability distribution over each pair of datapoints and assigns a probability based on how similar they are. Then, it creates a second probability distribution for the points when they're already on the manifold. Then, the divergence between the two distribution is minimised. The only problem is that t-SNE has hyperparameters so the initial conditions may not return your desired result. For further reading on hyperparameter tuning and seeing t-SNE in action, this [Distill article](https://distill.pub/2016/misread-tsne/) remains the best.
 
 ```{r, message = FALSE}
 
@@ -117,7 +118,7 @@ birds %>%
 
 ## UMAP
 
-Uniform manifold approximation and projection (UMAP) is a non-linear reduction technique. Developed in 2018, it is similar to t-SNE. Unlike t-SNE, UMAP allows interpreting distances between clusters and UMAP is computationally faster than t-SNE. The paper itself can be found [here](https://arxiv.org/pdf/1802.03426.pdf). Overall, like t-SNE, UMAP is best used for visualising similar or dissimilar datapoints. The method is especially useful in transcriptomics. But there is noone stopping us from applying UMAP to our dataset!
+Uniform manifold approximation and projection (UMAP) is a non-linear reduction technique. Developed in 2018, it is similar to t-SNE. Unlike t-SNE, UMAP allows interpreting distances between clusters, UMAP is computationally faster than t-SNE and so far UMAP has shown less variance with each run. The paper on the method can be found [here](https://arxiv.org/pdf/1802.03426.pdf). Overall, like t-SNE, UMAP is best used for visualising similar or dissimilar datapoints. The method is especially useful in transcriptomics, cancer research and other fields that generate terabytes of data. But there is noone stopping us from applying UMAP to our tiny dataset!
 
 ```{r, warning = FALSE}
 
@@ -146,7 +147,7 @@ birds %>%
 
 ```
 
-Generally, the output is similar to PCA's results - the large platform nesting birds are far from the rest of the data, ground nesting birds and cavity nesting birds are on the side while the rest of the tiny birds are intermingled in a single group. For an interactive chart, we are going to use UMAP's results.
+Generally, the output is similar to PCA's results - the large platform nesting birds are away from the rest of the data, ground nesting birds and cavity nesting birds are on the side while the rest of the tiny birds are intermingled in a single group. For an interactive chart, we are going to use UMAP's results.
 
 ## Pulling birb images from Wikimedia
 
@@ -208,11 +209,11 @@ birds$image_url <- unlist(bird_urls)
 
 ## Building the interactive chart
 
-The interactive chart is built using `htmltools` and `highcharter`.
+The interactive chart is built using `htmltools` and `highcharter`, with most of the code borrowed from Joshua Kunst's Pokemon post. `highcharter` is a great library that I have minimal experience with, so it's all about learning from great examples. 
 
 ```{r}
 
-xt <- c("common_name", "scientific_name")
+xt <- c("common_name", "scientific_name","wingspan","nest_type","egg_capacity")
 
 yt <- str_c("{point.", xt, "}")
 
