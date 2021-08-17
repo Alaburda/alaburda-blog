@@ -1974,6 +1974,135 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_distill-->
   <script src="../../site_libs/header-attrs-2.6/header-attrs.js"></script>
   <!--radix_placeholder_site_in_header-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!/posts/.test(location.pathname)) {
+      return;
+    }
+
+    var script = document.createElement("script");
+    script.src = "https://utteranc.es/client.js";
+    script.setAttribute("repo", "jbkunst/blog");
+    script.setAttribute("issue-term", "title");
+    script.setAttribute("crossorigin", "anonymous");
+    script.setAttribute("label", "comments š’¬");
+    script.setAttribute("theme", "github-light");
+
+    /* wait for article to load, append script to article element */
+    var observer = new MutationObserver(function (mutations, observer) {
+      var article = document.querySelector("d-article");
+      if (article) {
+        observer.disconnect();
+        /* HACK: article scroll */
+        article.setAttribute("style", "overflow-y: hidden");
+        article.appendChild(script);
+      }
+    });
+
+    observer.observe(document.body, { childList: true });
+  });
+</script>
+<style type="text/css">
+d-article {
+  font-weight: 300;
+}
+
+.distill-site-nav {
+  animation:backgroundtransition 100s;
+  -moz-animation:backgroundtransition 100s infinite; /* Firefox */
+  -webkit-animation:backgroundtransition 100s infinite; /* Safari and Chrome */
+}
+
+@-moz-keyframes backgroundtransition /* Firefox */ {
+   0%   {background: #B71C1C;} /* red */
+   10%  {background: #311b92;} /* deep purlple */
+   20%  {background: #0D47A1;} /* blue */
+   30%  {background: #004D40;} /* teal */
+   40%  {background: #212121;} /* grey */
+   50%  {background: #1A237E;} /* indigo */
+   60%  {background: #33691E;} /* ligth green */
+   70%  {background: #006064;} /* cyan */
+   80%  {background: #827717;} /* lime */
+   90%  {background: #263238;} /* blue gray*/
+   100% {background: #B71C1C;} /* red */
+}
+
+@-webkit-keyframes backgroundtransition /* Safari and Chrome */ {
+   0%   {background: #B71C1C;} /* red */
+   10%  {background: #311b92;} /* deep purlple */
+   20%  {background: #0D47A1;} /* blue */
+   30%  {background: #004D40;} /* teal */
+   40%  {background: #212121;} /* grey */
+   50%  {background: #1A237E;} /* indigo */
+   60%  {background: #33691E;} /* ligth green */
+   70%  {background: #006064;} /* cyan */
+   80%  {background: #827717;} /* lime */
+   90%  {background: #263238;} /* blue gray*/
+   100% {background: #B71C1C;} /* red */
+}
+
+/* https://codepen.io/sdthornton/pen/wBZdXq */
+.distill-site-header {
+   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+/* thunder animation */
+/* from http://jsrocks.org/ */
+.fab:hover, .fa:hover, .fas:hover {
+    animation-name: thunder;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+
+    -webkit-animation-name: thunder;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    -webkit-animation-iteration-count: infinite;
+     transition: all 150ms ease 0s;
+}
+
+@keyframes thunder{
+    0%, 20%, 40%, 60%, 80%, 100% {
+        transform: rotate3d(0, 0, 1, -5deg);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: rotate3d(0, 0, 1, 5deg);
+    }
+}
+
+@-webkit-keyframes thunder{
+    0%, 20%, 40%, 60%, 80%, 100% {
+        transform: rotate3d(0, 0, 1, -5deg);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: rotate3d(0, 0, 1, 5deg);
+    }
+}
+
+
+/* subscribe button */
+.sbt {
+  color: black;
+  background-color: #e7e7e7;
+  border: 2px solid #e7e7e7;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  padding: 0px;
+}
+
+#distill-search {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8em;
+}
+
+d-article iframe {
+  border: none;
+}
+
+</style>
 <!--/radix_placeholder_site_in_header-->
 
 
@@ -1996,8 +2125,19 @@ document.addEventListener('DOMContentLoaded', function() {
 <input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
 </div>
 <div class="nav-right">
-<a href="../../index.html">Home</a>
-<a href="../../about.html">About</a>
+<a href="../../index.html">About</a>
+<a href="../../posts.html">Posts</a>
+<a href="../../projects.html">Projects</a>
+<a href="../../board-game-reviews.html">Reviews</a>
+<a href="https://www.linkedin.com/in/pauliusalaburda">
+<i class="fab fa-linkedin" aria-hidden="true"></i>
+</a>
+<a href="https://twitter.com/p_alab">
+<i class="fab fa-twitter" aria-hidden="true"></i>
+</a>
+<a href="https://github.com/Alaburda/alaburda_distill" aria-label="Link to source">
+<i class="fab fa-github" aria-hidden="true"></i>
+</a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
 </nav>

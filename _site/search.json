@@ -6,14 +6,14 @@
       "description": "Some additional details about the blog",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-08-09T21:57:55+03:00"
+      "last_modified": "2021-08-17T09:34:41+03:00"
     },
     {
       "path": "index.html",
       "title": "Paulius Alaburda",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-08-09T21:57:58+03:00"
+      "last_modified": "2021-08-17T09:34:44+03:00"
     }
   ],
   "collections": ["posts/posts.json"]
